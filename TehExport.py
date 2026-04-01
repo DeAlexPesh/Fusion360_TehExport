@@ -126,6 +126,7 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
                 return
 
             with FusionFileExport(app, output_path) as total_export:
+                total_export.unhide_bodies = values['unhide_bodies']
                 total_export.export_step = values['export_step']
                 total_export.export_iges = values['export_iges']
                 total_export.export_stl = values['export_stl']
@@ -203,6 +204,8 @@ class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
             dropdown3Items.add('Project', False, '')
             dropdown3Items.add('File', True, '')
 
+            inputs.addBoolValueInput(
+                'unhide_bodies', 'Unhide bodies', True, "", True)
             inputs.addBoolValueInput(
                 'export_step', 'Export step', True, "", True)
             inputs.addBoolValueInput(

@@ -30,6 +30,7 @@ class FusionFileExport(object):
         self.temp_foler_name = "_temp"
         self.exportignore = ""
 
+        self.unhide_bodies = True
         self.export_step = True
         self.export_stl = False
         self.export_iges = False
@@ -349,6 +350,11 @@ class FusionFileExport(object):
 
                 # self._write_component(file_folder_path, design.rootComponent)
 
+                            
+            # UNHIDE before STEP/STL
+            if self.unhide_bodies:
+                self.unhide_all_in_component(design.rootComponent)
+
             if not os.path.exists(zip_acrhive_path) or os.path.getsize(zip_acrhive_path) < 50:
                 fusion_document: adsk.fusion.FusionDocument = adsk.fusion.FusionDocument.cast(
                     document)
@@ -598,3 +604,38 @@ class FusionFileExport(object):
             return False
 
         return True
+
+    def unhide_all_in_component(self, component: adsk.fusion.Component):
+        if not component:
+            return
+
+        # Включаем отображение папки тел
+        try:
+            component.isBodiesFolderLightBulbOn = True
+        except:
+            pass
+
+        # Включаем отображение твердотельных тел
+        for body in component.bRepBodies:
+            try:
+                body.isLightBulbOn = True
+                body.isVisible = True
+            except:
+                pass
+
+        # Включаем отображение сеточных тел
+        for mesh_body in component.meshBodies:
+            try:
+                mesh_body.isLightBulbOn = True
+                mesh_body.isVisible = True
+            except:
+                pass
+
+        # Рекурсивно раскрываем все вхождения подкомпонентов
+        for occurrence in component.occurrences:
+            try:
+                occurrence.isLightBulbOn = True
+                if occurrence.component:
+                    self.unhide_all_in_component(occurrence.component)
+            except:
+                pass
