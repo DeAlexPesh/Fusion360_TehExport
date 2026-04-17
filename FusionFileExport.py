@@ -202,7 +202,8 @@ class FusionFileExport(object):
             return
 
         for file_index in range(len(files)):
-            self.app.activeViewport.refresh()
+            if self.app.activeViewport:
+                self.app.activeViewport.refresh()
             adsk.doEvents()
 
             if self.progress_dialog.wasCancelled:
@@ -296,7 +297,11 @@ class FusionFileExport(object):
                 "Path is too long. Skip \"{}\"".format(file_export_path))
             return
 
-        is_assembly = file.hasChildReferences  # very slow call ~0.2s
+        try:
+            is_assembly = file.hasChildReferences  # very slow call ~0.2s
+        except:
+            is_assembly = true
+            
         is_file_export_path_exist = os.path.exists(file_export_path)
         is_assembly_export_path_exist = os.path.exists(assembly_export_path)
         is_zip_acrhive_exist = os.path.exists(zip_acrhive_path + ".zip")
@@ -320,7 +325,8 @@ class FusionFileExport(object):
                 file_folder_path, file_export_path))
 
             if not os.path.exists(file_export_path + ".png"):
-                self.app.activeViewport.refresh()
+                if self.app.activeViewport:
+                    self.app.activeViewport.refresh()
                 adsk.doEvents()
                 self.app.activeViewport.saveAsImageFile(
                     file_export_path + '.png', 512, 512)
