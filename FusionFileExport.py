@@ -202,7 +202,8 @@ class FusionFileExport(object):
             return
 
         for file_index in range(len(files)):
-            self.app.activeViewport.refresh()
+            if self.app.activeViewport:
+                self.app.activeViewport.refresh()
             adsk.doEvents()
 
             if self.progress_dialog.wasCancelled:
@@ -320,7 +321,8 @@ class FusionFileExport(object):
                 file_folder_path, file_export_path))
 
             if not os.path.exists(file_export_path + ".png"):
-                self.app.activeViewport.refresh()
+                if self.app.activeViewport:
+                    self.app.activeViewport.refresh()
                 adsk.doEvents()
                 self.app.activeViewport.saveAsImageFile(
                     file_export_path + '.png', 512, 512)
